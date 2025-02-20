@@ -1,0 +1,69 @@
+using Microsoft.AspNetCore.Mvc;
+using api.Dtos;
+using api.Services;
+
+namespace api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class HeroisController : ControllerBase
+{
+    private readonly IHeroiService _heroiService;
+
+    public HeroisController(IHeroiService heroiService)
+    {
+        _heroiService = heroiService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var herois = await _heroiService.GetAllHeroisAsync(cancellationToken);
+        return Ok(herois);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    {
+        var heroi = await _heroiService.GetHeroiByIdAsync(id, cancellationToken);
+        if (heroi == null) return NotFound("Heroi não encontrado");
+        return Ok(heroi);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(HeroiDto heroi, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var heroiCriado = await _heroiService.CreateHeroiAsync(heroi, cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id = heroiCriado.Id }, heroiCriado);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, HeroiDto heroi, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _heroiService.UpdateHeroiAsync(id, heroi, cancellationToken);
+            if (!result) return NotFound("Heroi não encontrado");
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        var result = await _heroiService.DeleteHeroiAsync(id, cancellationToken);
+        if (!result) return NotFound("Heroi não encontrado");
+        return NoContent();
+    }
+}
