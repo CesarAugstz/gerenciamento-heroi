@@ -12,7 +12,8 @@ import { HeroiFormComponent } from '../heroi-form/heroi-form.component';
 })
 export class HeroisListaComponent implements OnInit {
   herois: Heroi[] = [];
-  colunas: string[] = ['id', 'nome', 'nomeHeroi', 'dataNascimento', 'altura', 'peso', 'acoes'];
+  colunas = ['id', 'nome', 'nomeHeroi', 'dataNascimento', 'altura', 'peso', 'superpoderes', 'acoes'];
+
 
   constructor(
     private heroiService: HeroiService,

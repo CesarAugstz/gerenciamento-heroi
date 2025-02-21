@@ -12,6 +12,13 @@ namespace api.Mappings
             .ForMember(dest => dest.HeroisSuperpoderes, opt => opt.Ignore());
 
             CreateMap<Herois, HeroiDto>();
+
+            CreateMap<Herois, HeroiOutDto>()
+            .ForMember(dest => dest.Superpoderes, opt => opt.MapFrom(src => src.HeroisSuperpoderes.Select(hs => hs.Superpoder)));
+
+            CreateMap<Superpoderes, SuperpoderDto>();
+
+            CreateMap<SuperpoderDto, Superpoderes>().ReverseMap();
         }
     }
 }

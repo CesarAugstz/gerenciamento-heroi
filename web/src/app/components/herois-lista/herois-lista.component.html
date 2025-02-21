@@ -37,6 +37,17 @@
         <th mat-header-cell *matHeaderCellDef>Peso</th>
         <td mat-cell *matCellDef="let heroi">{{heroi.peso}} kg</td>
       </ng-container>
+
+      <ng-container matColumnDef="superpoderes">
+        <th mat-header-cell *matHeaderCellDef>Superpoderes</th>
+        <td mat-cell *matCellDef="let heroi">
+          <mat-chip-set role="list">
+            <mat-chip role="listitem" *ngFor="let poder of heroi.superpoderes" color="accent">
+              {{poder.superpoder}}
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
   
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef>Ações</th>

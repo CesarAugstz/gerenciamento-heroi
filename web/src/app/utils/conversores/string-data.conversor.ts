@@ -14,11 +14,12 @@ export function converterStringParaData(
     if (!(typeof data === 'string')) return E.left(new Error('Data inválida'));
     if (!data) return E.left(new Error('Data inválida'));
 
-    const { formato = 'DDMMYYYY' } = opcoes;
+    const { formato = 'DD/MM/YYYY' } = opcoes;
 
-    const dataLimpa = data.replace(/\D/g, '').substring(0, 8);
+    const dataConvertidaDayjs = dayjs(data, formato, true);
 
-    const dataConvertidaDayjs = dayjs(dataLimpa, formato, true);
+    if (!dataConvertidaDayjs.isValid())
+      return E.left(new Error('Data inválida'));
 
     return E.right(dataConvertidaDayjs.toDate());
   } catch (error) {

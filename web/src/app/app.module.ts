@@ -21,7 +21,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
+import { MatChipsModule } from '@angular/material/chips';
 import { HttpClientModule } from '@angular/common/http';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent, HeroisListaComponent, HeroiFormComponent],
@@ -44,6 +47,9 @@ import { HttpClientModule } from '@angular/common/http';
     MatToolbarModule,
     RouterModule,
     AppRoutingModule,
+    MatChipsModule,
+    MatSelectModule,
+    FormsModule,
   ],
   bootstrap: [AppComponent],
 })

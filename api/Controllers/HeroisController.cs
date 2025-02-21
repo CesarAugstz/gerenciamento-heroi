@@ -30,13 +30,20 @@ public class HeroisController : ControllerBase
         return Ok(heroi);
     }
 
+    [HttpGet("superpoderes")]
+    public async Task<IActionResult> GetAllSuperpoderes(CancellationToken cancellationToken)
+    {
+        var superpoderes = await _heroiService.GetAllSuperpoderes(cancellationToken);
+        return Ok(superpoderes);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(HeroiDto heroi, CancellationToken cancellationToken)
     {
         try
         {
             var heroiCriado = await _heroiService.CreateHeroiAsync(heroi, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new { id = heroiCriado.Id }, heroiCriado);
+            return Created();
         }
         catch (InvalidOperationException ex)
         {

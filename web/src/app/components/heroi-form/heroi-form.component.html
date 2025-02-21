@@ -19,7 +19,6 @@
       <mat-label>Nome de Herói</mat-label>
       <input
         matInput
-        (input)="formatarData($event)"
         formControlName="nomeHeroi"
         placeholder="Nome como herói"
       />
@@ -75,6 +74,17 @@
           errosValidacao["peso"]
         }}</mat-error>
       </mat-form-field>
+      </div>
+
+      <div class="campo-linha">
+        <mat-form-field appearance="outline" class="campo-completo">
+          <mat-label>Superpoderes</mat-label>
+          <mat-select multiple formControlName="superpoderes">
+            <mat-option *ngFor="let poder of superpoderes" [value]="poder.id">
+              {{ poder.superpoder }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
     </div>
   </div>
 

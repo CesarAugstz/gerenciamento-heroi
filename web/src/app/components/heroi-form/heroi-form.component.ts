@@ -1,17 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Heroi } from '../../models/heroi.model';
+import { Heroi, Superpoder } from '../../models/heroi.model';
 import { HeroiService } from '../../services/heroi.service';
 import { z } from 'zod';
-import { obterHeroiFormularioSchema } from '../../schemas/obterHeroiFormularioSchema';
-import {
-  formatarDataProgressivo,
-  tentarFormatarDataProgressivo,
-} from '../../utils/formatadores/data.formatador';
+import { tentarFormatarDataProgressivo } from '../../utils/formatadores/data.formatador';
 import dayjs from 'dayjs';
 import { tentarConverterStringParaData } from '../../utils/conversores/string-data.conversor';
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+import { obterEditarHeroiFormularioSchema } from '../../schemas/obterHeroiFormularioSchema';
 
 @Component({
   selector: 'app-heroi-form',
@@ -24,6 +21,7 @@ export class HeroiFormComponent implements OnInit {
   heroiForm!: FormGroup;
   modoEdicao: boolean = false;
   errosValidacao: Record<string, string> = {};
+  superpoderes: Superpoder[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -36,22 +34,31 @@ export class HeroiFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.carregarSuperpoderes();
     this.modoEdicao = !!this.data.id;
 
     this.heroiForm = this.fb.group({
       id: [this.data.id],
       nome: [this.data.nome || '', [Validators.required]],
       nomeHeroi: [this.data.nomeHeroi || '', [Validators.required]],
-      dataNascimento: [this.data.dataNascimento],
+      dataNascimento: [
+        dayjs(
+          this.data.dataNascimento as unknown as string,
+        ).toDate() || null,
+      ],
       altura: [
         this.data.altura || null,
         [Validators.required, Validators.min(0)],
       ],
       peso: [this.data.peso || null, [Validators.required, Validators.min(0)]],
+      superpoderes: [this.data.superpoderes?.map((s) => s.id) || []],
     });
+  }
 
-    console.log('oninit', {
-      formvalordata: this.heroiForm.value.dataNascimento,
+  carregarSuperpoderes(): void {
+    this.heroiService.getSuperpoderes().subscribe({
+      next: (poderes) => (this.superpoderes = poderes),
+      error: (erro) => console.error('Erro ao carregar superpoderes:', erro),
     });
   }
 
@@ -64,15 +71,16 @@ export class HeroiFormComponent implements OnInit {
     const dadosHeroi = this.heroiForm.value;
 
     try {
-      obterHeroiFormularioSchema().parse(dadosHeroi);
       this.errosValidacao = {};
 
       if (this.modoEdicao) {
+        obterEditarHeroiFormularioSchema().parse(dadosHeroi);
         this.heroiService.atualizarHeroi(dadosHeroi).subscribe({
           next: () => this.dialogRef.close(true),
           error: (erro) => console.error('Erro ao atualizar herói:', erro),
         });
       } else {
+        obterEditarHeroiFormularioSchema().parse(dadosHeroi);
         this.heroiService.adicionarHeroi(dadosHeroi).subscribe({
           next: () => this.dialogRef.close(true),
           error: (erro) => console.error('Erro ao adicionar herói:', erro),
@@ -97,25 +105,25 @@ export class HeroiFormComponent implements OnInit {
   formatarData(event?: Event): void {
     const input = event?.target as HTMLInputElement | null;
 
-    const valorForm = this.heroiForm.value.dataNascimento;
-
     if (!input) return;
     const cursorPosition = input?.selectionStart || 0;
-    const valorRaw = input?.value ?? valorForm;
+    const valorRaw = input?.value;
 
     const valorFormatado = tentarFormatarDataProgressivo(valorRaw).ou('');
 
     const novaPosicao =
       cursorPosition + (valorFormatado?.length - valorRaw?.length);
 
-    this.heroiForm.patchValue({
-      dataNascimento: tentarConverterStringParaData(valorFormatado).ouIgnorar(),
-    });
+    if (valorFormatado?.length === 10) {
+      this.heroiForm.patchValue({
+        dataNascimento:
+          tentarConverterStringParaData(valorFormatado).ouIgnorar(),
+      });
+    }
 
     input.value = valorFormatado;
     requestAnimationFrame(() => {
       input?.setSelectionRange(novaPosicao, novaPosicao);
     });
   }
-  mudouData(event?: Event): void {}
 }

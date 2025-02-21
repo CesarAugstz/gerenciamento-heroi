@@ -20,29 +20,52 @@ namespace api.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Herois>> GetAllHeroisAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<HeroiOutDto>> GetAllHeroisAsync(CancellationToken cancellationToken)
         {
-            return await _repositorio.BuscarTodosAsync(cancellationToken);
+            var herois = await _repositorio.Buscar(query: query => query.Include(h => h.HeroisSuperpoderes).ThenInclude(hs => hs.Superpoder), cancellationToken);
+
+            return herois.Select(h => _mapper.Map<HeroiOutDto>(h));
         }
 
-        public async Task<Herois?> GetHeroiByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<HeroiOutDto?> GetHeroiByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _repositorio.BuscarPorIdAsync(id, cancellationToken);
+            var heroi = await _repositorio.Buscar(query => query.Where(h => h.Id == id).Include(h => h.HeroisSuperpoderes).ThenInclude(hs => hs.Superpoder), cancellationToken);
+            if (heroi == null) return null;
+            return _mapper.Map<HeroiOutDto>(heroi);
+        }
+
+        public async Task<IEnumerable<SuperpoderDto?>> GetAllSuperpoderes(CancellationToken cancellationToken)
+        {
+            var superpoderes = await _context.Superpoderes.ToListAsync(cancellationToken);
+            return superpoderes.Select(s => _mapper.Map<SuperpoderDto>(s));
         }
 
         public async Task<Herois> CreateHeroiAsync(HeroiDto heroi, CancellationToken cancellationToken)
         {
             var heroiExistente = await _repositorio.Buscar(
-                query => query.Where(h => h.NomeHeroi == heroi.NomeHeroi), 
+                query => query.Where(h => h.NomeHeroi == heroi.NomeHeroi),
                 cancellationToken);
 
             if (heroiExistente.Any())
                 throw new InvalidOperationException("Já existe um heroi com esse nome");
 
             var heroiMapeado = _mapper.Map<Herois>(heroi);
-            return await _repositorio.AdicionarAsync(heroiMapeado, cancellationToken);
-        }
 
+            heroiMapeado.HeroisSuperpoderes = new List<HeroisSuperpoderes>();
+            foreach (var superpoderId in heroi.Superpoderes)
+            {
+                heroiMapeado.HeroisSuperpoderes.Add(new HeroisSuperpoderes
+                {
+                    HeroiId = heroiMapeado.Id,
+                    SuperpoderId = superpoderId
+                });
+            }
+
+            var createdHeroi = await _repositorio.AdicionarAsync(heroiMapeado, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return createdHeroi;
+        }
         public async Task<bool> UpdateHeroiAsync(int id, HeroiDto heroi, CancellationToken cancellationToken)
         {
             var heroiExistente = await _context.Herois
