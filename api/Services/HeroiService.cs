@@ -14,40 +14,27 @@ namespace api.Services
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
-        public HeroiService(
-            IRepository<Herois> repositorio,
-            IMapper mapper,
-            ApplicationDbContext context
-        )
+        public HeroiService(IRepository<Herois> repositorio, IMapper mapper, ApplicationDbContext context)
         {
             _repositorio = repositorio;
             _mapper = mapper;
             _context = context;
         }
 
-        public async Task<IEnumerable<HeroiOutDto>> GetAllHeroisAsync(
-            CancellationToken cancellationToken
-        )
+        public async Task<IEnumerable<HeroiOutDto>> GetAllHeroisAsync(CancellationToken cancellationToken)
         {
             var herois = await _repositorio.Buscar(
-                query: query =>
-                    query.Include(h => h.HeroisSuperpoderes).ThenInclude(hs => hs.Superpoder),
+                query: query => query.Include(h => h.HeroisSuperpoderes).ThenInclude(hs => hs.Superpoder),
                 cancellationToken
             );
             return herois.Select(h => _mapper.Map<HeroiOutDto>(h));
         }
 
-        public async Task<HeroiOutDto> GetHeroiByIdAsync(
-            int id,
-            CancellationToken cancellationToken
-        )
+        public async Task<HeroiOutDto> GetHeroiByIdAsync(int id, CancellationToken cancellationToken)
         {
             var heroi = await _repositorio.Buscar(
                 query =>
-                    query
-                        .Where(h => h.Id == id)
-                        .Include(h => h.HeroisSuperpoderes)
-                        .ThenInclude(hs => hs.Superpoder),
+                    query.Where(h => h.Id == id).Include(h => h.HeroisSuperpoderes).ThenInclude(hs => hs.Superpoder),
                 cancellationToken
             );
 
@@ -57,9 +44,7 @@ namespace api.Services
             return _mapper.Map<HeroiOutDto>(heroi.First());
         }
 
-        public async Task<IEnumerable<SuperpoderDto>> GetAllSuperpoderes(
-            CancellationToken cancellationToken
-        )
+        public async Task<IEnumerable<SuperpoderDto>> GetAllSuperpoderes(CancellationToken cancellationToken)
         {
             var superpoderes = await _context.Superpoderes.ToListAsync(cancellationToken);
             if (!superpoderes.Any())
@@ -68,10 +53,7 @@ namespace api.Services
             return superpoderes.Select(s => _mapper.Map<SuperpoderDto>(s));
         }
 
-        public async Task<Herois> CreateHeroiAsync(
-            HeroiDto heroi,
-            CancellationToken cancellationToken
-        )
+        public async Task<Herois> CreateHeroiAsync(HeroiDto heroi, CancellationToken cancellationToken)
         {
             var heroiExistente = await _repositorio.Buscar(
                 query => query.Where(h => h.NomeHeroi == heroi.NomeHeroi),
@@ -86,11 +68,7 @@ namespace api.Services
 
             var heroiMapeado = _mapper.Map<Herois>(heroi);
             heroiMapeado.HeroisSuperpoderes = heroi
-                .Superpoderes.Select(id => new HeroisSuperpoderes
-                {
-                    HeroiId = heroiMapeado.Id,
-                    SuperpoderId = id,
-                })
+                .Superpoderes.Select(id => new HeroisSuperpoderes { HeroiId = heroiMapeado.Id, SuperpoderId = id })
                 .ToList();
 
             var createdHeroi = await _repositorio.AdicionarAsync(heroiMapeado, cancellationToken);
@@ -99,11 +77,7 @@ namespace api.Services
             return createdHeroi;
         }
 
-        public async Task<bool> UpdateHeroiAsync(
-            int id,
-            HeroiDto heroi,
-            CancellationToken cancellationToken
-        )
+        public async Task<bool> UpdateHeroiAsync(int id, HeroiDto heroi, CancellationToken cancellationToken)
         {
             var heroiExistente = await _context
                 .Herois.Include(h => h.HeroisSuperpoderes)
@@ -149,10 +123,7 @@ namespace api.Services
             return true;
         }
 
-        public async Task<IEnumerable<HeroiOutDto>> SearchHeroisAsync(
-            string term,
-            CancellationToken cancellationToken
-        )
+        public async Task<IEnumerable<HeroiOutDto>> SearchHeroisAsync(string term, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(term))
                 throw new HeroiInvalidoException("Termo de busca não pode ser vazio");
@@ -161,10 +132,7 @@ namespace api.Services
             var herois = await _repositorio.Buscar(
                 query =>
                     query
-                        .Where(h =>
-                            EF.Functions.Like(h.Nome, searchTerm)
-                            || EF.Functions.Like(h.NomeHeroi, searchTerm)
-                        )
+                        .Where(h => EF.Functions.Like(h.Nome, searchTerm) || EF.Functions.Like(h.NomeHeroi, searchTerm))
                         .OrderBy(h => h.Nome.StartsWith(term) ? 0 : 1)
                         .ThenBy(h => h.NomeHeroi)
                         .ThenBy(h => h.Nome)
