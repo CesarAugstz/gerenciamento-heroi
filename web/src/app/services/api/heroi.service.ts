@@ -39,12 +39,6 @@ export class HeroiService extends BaseService {
       .pipe(catchError(this.tratarErro));
   }
 
-  getSuperpoderes(): Observable<Superpoder[]> {
-    return this.http
-      .get<Superpoder[]>(`${this.endpoint}/superpoderes`)
-      .pipe(catchError(this.tratarErro));
-  }
-
   searchHerois(searchTerm: string): Observable<Heroi[]> {
     return this.http
       .get<Heroi[]>(`${this.endpoint}/search`, {

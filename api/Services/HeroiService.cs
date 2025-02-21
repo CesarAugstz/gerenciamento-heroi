@@ -44,15 +44,6 @@ namespace api.Services
             return _mapper.Map<HeroiOutDto>(heroi.First());
         }
 
-        public async Task<IEnumerable<SuperpoderDto>> GetAllSuperpoderes(CancellationToken cancellationToken)
-        {
-            var superpoderes = await _context.Superpoderes.ToListAsync(cancellationToken);
-            if (!superpoderes.Any())
-                throw new SuperpoderNaoEncontradoException();
-
-            return superpoderes.Select(s => _mapper.Map<SuperpoderDto>(s));
-        }
-
         public async Task<Herois> CreateHeroiAsync(HeroiDto heroi, CancellationToken cancellationToken)
         {
             var heroiExistente = await _repositorio.Buscar(

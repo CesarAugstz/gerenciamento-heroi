@@ -15,6 +15,7 @@ import { obterEditarHeroiFormularioSchema } from '../../schemas/obterHeroiFormul
 import { HeroiService } from '../../services/api/heroi.service';
 import { MensagemService } from '../../services/ng/mensagem.service';
 import dayJs from '../../utils/dayjs/dayjs.utils';
+import { SuperpoderesService } from '../../services/api/superpoderes.service';
 
 @Component({
   selector: 'app-heroi-form',
@@ -32,6 +33,7 @@ export class HeroiFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private heroiService: HeroiService,
+    private superpoderService: SuperpoderesService,
     private dialogRef: MatDialogRef<HeroiFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Partial<Heroi>,
     private dateAdapter: DateAdapter<any>,
@@ -67,7 +69,7 @@ export class HeroiFormComponent implements OnInit {
   }
 
   carregarSuperpoderes(): void {
-    this.heroiService.getSuperpoderes().subscribe({
+    this.superpoderService.getSuperpoderes().subscribe({
       next: (poderes) => (this.superpoderes = poderes),
       error: (erro) =>
         this.mensagemService.mostrarErro('Erro ao carregar superpoderes', erro),

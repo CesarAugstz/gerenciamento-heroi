@@ -20,6 +20,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<IHeroiService, HeroiService>();
+builder.Services.AddScoped<ISuperpoderesService, SuperpoderesService>();
 
 var config = new MapperConfiguration(cfg =>
 {

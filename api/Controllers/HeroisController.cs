@@ -31,13 +31,6 @@ public class HeroisController : ControllerBase
         return Ok(heroi);
     }
 
-    [HttpGet("superpoderes")]
-    public async Task<IActionResult> GetAllSuperpoderes(CancellationToken cancellationToken)
-    {
-        var superpoderes = await _heroiService.GetAllSuperpoderes(cancellationToken);
-        return Ok(superpoderes);
-    }
-
     [HttpPost]
     public async Task<IActionResult> Create(HeroiDto heroi, CancellationToken cancellationToken)
     {
