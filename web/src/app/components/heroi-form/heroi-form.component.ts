@@ -44,8 +44,13 @@ export class HeroiFormComponent implements OnInit {
     this.carregarSuperpoderes();
     this.modoEdicao = !!this.data.id;
 
-    const dataConvertida = dayJs(this.data.dataNascimento as unknown as string);
-    const dataValor = dataConvertida.isValid() ? dataConvertida.toDate() : null;
+    const dataConvertida = this.data.dataNascimento
+      ? dayJs(this.data.dataNascimento as unknown as string)
+      : null;
+
+    const dataValor = dataConvertida?.isValid()
+      ? dataConvertida.toDate()
+      : null;
 
     this.heroiForm = this.fb.group({
       id: [this.data.id],

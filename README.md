@@ -45,17 +45,19 @@ Sistema de gerenciamento de heróis e seus superpoderes desenvolvido com .NET 9 
 cd api
 ```
 
-2. Restaure os pacotes:
+2. Verifique seu arquivo `appsettings.json` e configure as conexões com o banco de dados.
+
+3. Restaure os pacotes:
 ```bash
 dotnet restore
 ```
 
-3. Execute as migrações:
+4. Execute as migrações:
 ```bash
 dotnet ef database update
 ```
 
-4. Inicie a API:
+5. Inicie a API:
 ```bash
 dotnet run
 ```
