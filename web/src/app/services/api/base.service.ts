@@ -8,13 +8,22 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root',
 })
 export class BaseService {
-  protected apiUrl = environment.apiUrl
+  protected apiUrl = environment.apiUrl;
 
   constructor(protected http: HttpClient) {
     if (!this.apiUrl) throw new Error('API_URL não definida');
   }
 
   protected tratarErro(error: unknown) {
+    if (
+      error instanceof Object &&
+      'error' in error &&
+      typeof error.error === 'string'
+    ) {
+      console.error('Ocorreu um erro:', error.error);
+      return throwError(() => new Error(error.error as string));
+    }
+
     if (error instanceof Error) {
       console.error('Ocorreu um erro:', error.message);
       return throwError(() => error);

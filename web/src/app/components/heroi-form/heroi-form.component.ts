@@ -44,13 +44,14 @@ export class HeroiFormComponent implements OnInit {
     this.carregarSuperpoderes();
     this.modoEdicao = !!this.data.id;
 
+    const dataConvertida = dayJs(this.data.dataNascimento as unknown as string);
+    const dataValor = dataConvertida.isValid() ? dataConvertida.toDate() : null;
+
     this.heroiForm = this.fb.group({
       id: [this.data.id],
       nome: [this.data.nome || '', [Validators.required]],
       nomeHeroi: [this.data.nomeHeroi || '', [Validators.required]],
-      dataNascimento: [
-        dayJs(this.data.dataNascimento as unknown as string).toDate() || null,
-      ],
+      dataNascimento: [dataValor || null],
       altura: [
         this.data.altura || null,
         [Validators.required, Validators.min(0)],
@@ -76,7 +77,7 @@ export class HeroiFormComponent implements OnInit {
 
     if (this.errosValidacao['dataNascimento']) {
       this.mensagemService.mostrarErro(
-        `Erro de validação: ${this.errosValidacao['dataNascimento']}`,
+        `Erro de validação: ${this.errosValidacao['dataNascimento']}`
       );
       return;
     }

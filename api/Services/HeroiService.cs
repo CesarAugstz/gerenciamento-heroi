@@ -105,5 +105,22 @@ namespace api.Services
         {
             return await _repositorio.DeletarAsync(id, cancellationToken);
         }
+        public async Task<IEnumerable<HeroiOutDto>> SearchHeroisAsync(string term, CancellationToken cancellationToken)
+        {
+            var searchTerm = $"%{term}%";
+
+            var herois = await _repositorio.Buscar(
+                query => query
+                    .Where(h => EF.Functions.Like(h.Nome, searchTerm) ||
+                                EF.Functions.Like(h.NomeHeroi, searchTerm))
+                    .OrderBy(h => h.Nome.StartsWith(term) ? 0 : 1)
+                    .ThenBy(h => h.NomeHeroi)
+                    .ThenBy(h => h.Nome)
+                    .Include(h => h.HeroisSuperpoderes)
+                    .ThenInclude(hs => hs.Superpoder),
+                cancellationToken);
+
+            return herois.Select(h => _mapper.Map<HeroiOutDto>(h));
+        }
     }
 }

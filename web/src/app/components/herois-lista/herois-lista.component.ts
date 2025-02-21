@@ -6,6 +6,8 @@ import { HeroiService } from '../../services/api/heroi.service';
 import { MensagemService } from '../../services/ng/mensagem.service';
 import { ConfirmacaoDialogComponent } from '../confirmacao-dialog/confirmacao-dialog.component';
 import dayJs from '../../utils/dayjs/dayjs.utils';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-herois-lista',
@@ -25,6 +27,7 @@ export class HeroisListaComponent implements OnInit {
     'superpoderes',
     'acoes',
   ];
+  searchControl = new FormControl('');
 
   constructor(
     private heroiService: HeroiService,
@@ -33,7 +36,26 @@ export class HeroisListaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.setupSearch();
     this.carregarHerois();
+  }
+
+  private setupSearch(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (!term) return this.heroiService.getHerois();
+        return this.heroiService.searchHerois(term);
+      })
+    ).subscribe({
+      next: (herois) => this.herois = herois,
+      error: (erro) => this.mensagemService.mostrarErro('Erro na busca', erro)
+    });
+  }
+
+  clearSearch(): void {
+    this.searchControl.setValue('');
   }
 
   carregarHerois(): void {

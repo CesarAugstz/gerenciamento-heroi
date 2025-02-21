@@ -73,4 +73,12 @@ public class HeroisController : ControllerBase
         if (!result) return NotFound("Heroi não encontrado");
         return NoContent();
     }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string term, CancellationToken cancellationToken)
+    {
+        var herois = await _heroiService.SearchHeroisAsync(term, cancellationToken);
+        return Ok(herois);
+    }
+
 }
