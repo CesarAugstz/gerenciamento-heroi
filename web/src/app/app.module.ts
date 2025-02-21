@@ -5,6 +5,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 // Componentes
 import { HeroisListaComponent } from './components/herois-lista/herois-lista.component';
@@ -22,12 +24,13 @@ import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { MatChipsModule } from '@angular/material/chips';
-import { HttpClientModule } from '@angular/common/http';
 import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ConfirmacaoDialogComponent } from './components/confirmacao-dialog/confirmacao-dialog.component';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
-  declarations: [AppComponent, HeroisListaComponent, HeroiFormComponent],
+  declarations: [AppComponent, HeroisListaComponent, HeroiFormComponent, ConfirmacaoDialogComponent],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }],
   imports: [
     HttpClientModule,
@@ -50,6 +53,8 @@ import { FormsModule } from '@angular/forms';
     MatChipsModule,
     MatSelectModule,
     FormsModule,
+    MatSnackBarModule,
+    MatDividerModule,
   ],
   bootstrap: [AppComponent],
 })

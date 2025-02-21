@@ -1,14 +1,20 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Heroi, Superpoder } from '../../models/heroi.model';
-import { HeroiService } from '../../services/heroi.service';
 import { z } from 'zod';
 import { tentarFormatarDataProgressivo } from '../../utils/formatadores/data.formatador';
-import dayjs from 'dayjs';
 import { tentarConverterStringParaData } from '../../utils/conversores/string-data.conversor';
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { obterEditarHeroiFormularioSchema } from '../../schemas/obterHeroiFormularioSchema';
+import { HeroiService } from '../../services/api/heroi.service';
+import { MensagemService } from '../../services/ng/mensagem.service';
+import dayJs from '../../utils/dayjs/dayjs.utils';
 
 @Component({
   selector: 'app-heroi-form',
@@ -28,7 +34,8 @@ export class HeroiFormComponent implements OnInit {
     private heroiService: HeroiService,
     private dialogRef: MatDialogRef<HeroiFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Partial<Heroi>,
-    private dateAdapter: DateAdapter<any>
+    private dateAdapter: DateAdapter<any>,
+    private mensagemService: MensagemService
   ) {
     this.dateAdapter.setLocale('pt-BR');
   }
@@ -42,9 +49,7 @@ export class HeroiFormComponent implements OnInit {
       nome: [this.data.nome || '', [Validators.required]],
       nomeHeroi: [this.data.nomeHeroi || '', [Validators.required]],
       dataNascimento: [
-        dayjs(
-          this.data.dataNascimento as unknown as string,
-        ).toDate() || null,
+        dayJs(this.data.dataNascimento as unknown as string).toDate() || null,
       ],
       altura: [
         this.data.altura || null,
@@ -58,13 +63,21 @@ export class HeroiFormComponent implements OnInit {
   carregarSuperpoderes(): void {
     this.heroiService.getSuperpoderes().subscribe({
       next: (poderes) => (this.superpoderes = poderes),
-      error: (erro) => console.error('Erro ao carregar superpoderes:', erro),
+      error: (erro) =>
+        this.mensagemService.mostrarErro('Erro ao carregar superpoderes', erro),
     });
   }
 
   onSubmit(): void {
     if (this.heroiForm.invalid) {
       this.heroiForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.errosValidacao['dataNascimento']) {
+      this.mensagemService.mostrarErro(
+        `Erro de validação: ${this.errosValidacao['dataNascimento']}`,
+      );
       return;
     }
 
@@ -76,19 +89,32 @@ export class HeroiFormComponent implements OnInit {
       if (this.modoEdicao) {
         obterEditarHeroiFormularioSchema().parse(dadosHeroi);
         this.heroiService.atualizarHeroi(dadosHeroi).subscribe({
-          next: () => this.dialogRef.close(true),
-          error: (erro) => console.error('Erro ao atualizar herói:', erro),
+          next: () => {
+            this.dialogRef.close(true);
+            this.mensagemService.mostrarSucesso(
+              'Herói atualizado com sucesso!'
+            );
+          },
+          error: (erro) =>
+            this.mensagemService.mostrarErro('Erro ao atualizar herói', erro),
         });
       } else {
         obterEditarHeroiFormularioSchema().parse(dadosHeroi);
         this.heroiService.adicionarHeroi(dadosHeroi).subscribe({
-          next: () => this.dialogRef.close(true),
-          error: (erro) => console.error('Erro ao adicionar herói:', erro),
+          next: () => {
+            this.dialogRef.close(true);
+            this.mensagemService.mostrarSucesso(
+              'Herói adicionado com sucesso!'
+            );
+          },
+          error: (erro) =>
+            this.mensagemService.mostrarErro('Erro ao adicionar herói', erro),
         });
       }
     } catch (erro) {
       console.error('Erro de validação:', { erro });
       if (erro instanceof z.ZodError) {
+        this.mensagemService.mostrarErro('Erro de validação', erro);
         this.errosValidacao = {};
         erro.errors.forEach((e) => {
           const campo = e.path[0].toString();
@@ -114,12 +140,19 @@ export class HeroiFormComponent implements OnInit {
     const novaPosicao =
       cursorPosition + (valorFormatado?.length - valorRaw?.length);
 
-    if (valorFormatado?.length === 10) {
-      this.heroiForm.patchValue({
-        dataNascimento:
-          tentarConverterStringParaData(valorFormatado).ouIgnorar(),
-      });
-    }
+    const dataConvertida =
+      tentarConverterStringParaData(valorFormatado).ouIgnorar();
+
+    if (!dayJs(dataConvertida).isValid()) {
+      this.errosValidacao['dataNascimento'] = 'Data inválida';
+    } else if (dayJs(dataConvertida).isAfter(dayJs())) {
+      this.errosValidacao['dataNascimento'] =
+        'Date de nascimento não pode ser maior que a data atual';
+    } else this.errosValidacao['dataNascimento'] = '';
+
+    const heroiControl = this.heroiForm.get('dataNascimento');
+    heroiControl?.patchValue(dataConvertida);
+    heroiControl?.updateValueAndValidity();
 
     input.value = valorFormatado;
     requestAnimationFrame(() => {

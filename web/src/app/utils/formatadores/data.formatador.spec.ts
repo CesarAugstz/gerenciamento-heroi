@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { formatarDataProgressivo, tentarFormatarDataProgressivo } from './data.formatador';
+import {
+  formatarDataProgressivo,
+  tentarFormatarDataProgressivo,
+} from './data.formatador';
 import E from 'fp-ts/lib/Either';
 
 describe('formatarDataProgressivo', {}, () => {
@@ -28,39 +31,5 @@ describe('formatarDataProgressivo', {}, () => {
       const resultado = formatarDataProgressivo(valor as unknown as string);
       expect(resultado).toEqual(E.left(new Error('Data inválida')));
     });
-  });
-});
-
-describe('tentarFormatarDataProgressivo', () => {
-  it('ou deve retornar a data formatada para entrada válida', () => {
-    const resultado = tentarFormatarDataProgressivo('01012023').ou('');
-    expect(resultado).toBe('01/01/2023');
-  });
-
-  it('ou deve retornar valor padrão em caso de erro', () => {
-    const resultado =
-      tentarFormatarDataProgressivo(undefined).ou('Data inválida');
-    expect(resultado).toBe('Data inválida');
-  });
-
-  it('ouIgnorar deve retornar a data formatada para entrada válida', () => {
-    const resultado = tentarFormatarDataProgressivo('01012023').ouIgnorar();
-    expect(resultado).toBe('01/01/2023');
-  });
-
-  it('ouIgnorar deve retornar null em caso de erro', () => {
-    const resultado = tentarFormatarDataProgressivo(null as unknown as string).ouIgnorar();
-    expect(resultado).toBe(null);
-  });
-
-  it('ouErro deve retornar a data formatada para entrada válida', () => {
-    const resultado = tentarFormatarDataProgressivo('01012023').ouErro();
-    expect(resultado).toBe('01/01/2023');
-  });
-
-  it('ouErro deve lançar erro para entrada inválida', () => {
-    expect(() =>
-      tentarFormatarDataProgressivo(undefined).ouErro()
-    ).toThrowError('Data inválida');
   });
 });

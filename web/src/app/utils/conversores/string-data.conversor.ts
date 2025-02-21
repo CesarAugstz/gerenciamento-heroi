@@ -1,6 +1,6 @@
-import dayjs from 'dayjs';
 import * as E from 'fp-ts/Either';
 import { criarFuncaoSafe } from '../fp-ts/criar-funcao-safe';
+import dayJs from '../dayjs/dayjs.utils';
 
 interface Args {
   formato?: string;
@@ -16,7 +16,7 @@ export function converterStringParaData(
 
     const { formato = 'DD/MM/YYYY' } = opcoes;
 
-    const dataConvertidaDayjs = dayjs(data, formato, true);
+    const dataConvertidaDayjs = dayJs(data, formato, true);
 
     if (!dataConvertidaDayjs.isValid())
       return E.left(new Error('Data inválida'));

@@ -30,6 +30,8 @@
       }}</mat-error>
     </mat-form-field>
 
+      erros Validacao {{ heroiForm.get('dataNascimento')?.errors }}
+      erros 2 {{ errosValidacao['dataNascimento'] }}
     <mat-form-field appearance="outline" class="campo-completo">
       <mat-label>Data de Nascimento</mat-label>
       <input
@@ -44,6 +46,10 @@
       <mat-hint>DD/MM/AAAA</mat-hint>
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
+      <mat-error
+        *ngIf="errosValidacao['dataNascimento']"
+        >{{ errosValidacao["dataNascimento"] }}</mat-error
+      >
     </mat-form-field>
 
     <div class="campos-linha">
@@ -74,17 +80,17 @@
           errosValidacao["peso"]
         }}</mat-error>
       </mat-form-field>
-      </div>
+    </div>
 
-      <div class="campo-linha">
-        <mat-form-field appearance="outline" class="campo-completo">
-          <mat-label>Superpoderes</mat-label>
-          <mat-select multiple formControlName="superpoderes">
-            <mat-option *ngFor="let poder of superpoderes" [value]="poder.id">
-              {{ poder.superpoder }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+    <div class="campo-linha">
+      <mat-form-field appearance="outline" class="campo-completo">
+        <mat-label>Superpoderes</mat-label>
+        <mat-select multiple formControlName="superpoderes">
+          <mat-option *ngFor="let poder of superpoderes" [value]="poder.id">
+            {{ poder.superpoder }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
   </div>
 

@@ -1,0 +1,41 @@
+.confirmacao-container {
+    padding: 0;
+  }
+  
+  .confirmacao-titulo {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    margin: 0;
+    background-color: #f5f5f5;
+    border-radius: 4px 4px 0 0;
+  }
+  
+  .icone-alerta {
+    color: #f44336;
+    margin-right: 10px;
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+  
+  .confirmacao-conteudo {
+    padding: 24px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .confirmacao-acoes {
+    padding: 16px 24px;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background-color: #f5f5f5;
+    border-radius: 0 0 4px 4px;
+  }
+  
+  button {
+    min-width: 120px;
+  }

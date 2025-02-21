@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Heroi, Superpoder } from '../models/heroi.model';
 import { BaseService } from './base.service';
+import { Heroi, Superpoder } from '../../models/heroi.model';
 
 @Injectable({
   providedIn: 'root',
