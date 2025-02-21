@@ -1,49 +1,83 @@
-<h2 mat-dialog-title>{{ modoEdicao ? 'Editar' : 'Adicionar' }} Herói</h2>
+<h2 mat-dialog-title>{{ modoEdicao ? "Editar" : "Adicionar" }} Herói</h2>
 
 <form [formGroup]="heroiForm" (ngSubmit)="onSubmit()">
   <div mat-dialog-content>
-    <input type="hidden" formControlName="id">
-    
+    <input type="hidden" formControlName="id" />
+
     <mat-form-field appearance="outline" class="campo-completo">
       <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome" placeholder="Nome real do herói">
-      <mat-error *ngIf="heroiForm.get('nome')?.errors?.['required']">Nome é obrigatório</mat-error>
-      <mat-error *ngIf="errosValidacao['nome']">{{ errosValidacao['nome'] }}</mat-error>
+      <input matInput formControlName="nome" placeholder="Nome real do herói" />
+      <mat-error *ngIf="heroiForm.get('nome')?.errors?.['required']"
+        >Nome é obrigatório</mat-error
+      >
+      <mat-error *ngIf="errosValidacao['nome']">{{
+        errosValidacao["nome"]
+      }}</mat-error>
     </mat-form-field>
-    
+
     <mat-form-field appearance="outline" class="campo-completo">
       <mat-label>Nome de Herói</mat-label>
-      <input matInput formControlName="nomeHeroi" placeholder="Nome como herói">
-      <mat-error *ngIf="heroiForm.get('nomeHeroi')?.errors?.['required']">Nome de herói é obrigatório</mat-error>
-      <mat-error *ngIf="errosValidacao['nomeHeroi']">{{ errosValidacao['nomeHeroi'] }}</mat-error>
+      <input
+        matInput
+        (input)="formatarData($event)"
+        formControlName="nomeHeroi"
+        placeholder="Nome como herói"
+      />
+      <mat-error *ngIf="heroiForm.get('nomeHeroi')?.errors?.['required']"
+        >Nome de herói é obrigatório</mat-error
+      >
+      <mat-error *ngIf="errosValidacao['nomeHeroi']">{{
+        errosValidacao["nomeHeroi"]
+      }}</mat-error>
     </mat-form-field>
-    
+
     <mat-form-field appearance="outline" class="campo-completo">
       <mat-label>Data de Nascimento</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="dataNascimento">
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="dataNascimento"
+        (input)="formatarData($event)"
+        type="text"
+        (dateChange)="formatarData()"
+        (dateInput)="formatarData()"
+      />
+      <mat-hint>DD/MM/AAAA</mat-hint>
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
-    
+
     <div class="campos-linha">
       <mat-form-field appearance="outline" class="campo-metade">
         <mat-label>Altura (m)</mat-label>
-        <input matInput type="number" step="0.01" formControlName="altura">
-        <mat-error *ngIf="heroiForm.get('altura')?.errors?.['required']">Altura é obrigatória</mat-error>
-        <mat-error *ngIf="heroiForm.get('altura')?.errors?.['min']">Altura deve ser positiva</mat-error>
-        <mat-error *ngIf="errosValidacao['altura']">{{ errosValidacao['altura'] }}</mat-error>
+        <input matInput type="number" step="0.01" formControlName="altura" />
+        <mat-error *ngIf="heroiForm.get('altura')?.errors?.['required']"
+          >Altura é obrigatória</mat-error
+        >
+        <mat-error *ngIf="heroiForm.get('altura')?.errors?.['min']"
+          >Altura deve ser positiva</mat-error
+        >
+        <mat-error *ngIf="errosValidacao['altura']">{{
+          errosValidacao["altura"]
+        }}</mat-error>
       </mat-form-field>
-      
+
       <mat-form-field appearance="outline" class="campo-metade">
         <mat-label>Peso (kg)</mat-label>
-        <input matInput type="number" step="0.1" formControlName="peso">
-        <mat-error *ngIf="heroiForm.get('peso')?.errors?.['required']">Peso é obrigatório</mat-error>
-        <mat-error *ngIf="heroiForm.get('peso')?.errors?.['min']">Peso deve ser positivo</mat-error>
-        <mat-error *ngIf="errosValidacao['peso']">{{ errosValidacao['peso'] }}</mat-error>
+        <input matInput type="number" step="0.1" formControlName="peso" />
+        <mat-error *ngIf="heroiForm.get('peso')?.errors?.['required']"
+          >Peso é obrigatório</mat-error
+        >
+        <mat-error *ngIf="heroiForm.get('peso')?.errors?.['min']"
+          >Peso deve ser positivo</mat-error
+        >
+        <mat-error *ngIf="errosValidacao['peso']">{{
+          errosValidacao["peso"]
+        }}</mat-error>
       </mat-form-field>
     </div>
   </div>
-  
+
   <div mat-dialog-actions align="end">
     <button mat-button type="button" (click)="cancelar()">Cancelar</button>
     <button mat-raised-button color="primary" type="submit">Salvar</button>

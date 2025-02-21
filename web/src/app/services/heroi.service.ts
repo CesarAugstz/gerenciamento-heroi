@@ -1,52 +1,41 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Heroi } from '../models/heroi.model';
+import { BaseService } from './base.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class HeroiService {
-  private herois: Heroi[] = [
-    { id: 1, nome: 'Bruce Wayne', nomeHeroi: 'Batman', altura: 1.88, peso: 95 },
-    { id: 2, nome: 'Clark Kent', nomeHeroi: 'Superman', altura: 1.91, peso: 107 }
-  ];
+export class HeroiService extends BaseService {
+  private endpoint = 'api/herois';
 
-  constructor() { }
-
-  getHerois(): Observable<Heroi[]> {
-    return of(this.herois);
+  constructor(http: HttpClient) {
+    super(http);
   }
 
-  getHeroi(id: number): Observable<Heroi> {
-    const heroi = this.herois.find(h => h.id === id);
-    if (heroi) {
-      return of(heroi);
-    }
-    return throwError(() => new Error('Herói não encontrado'));
+  getHerois(): Observable<Heroi[]> {
+    return this.http
+      .get<Heroi[]>(`${this.apiUrl}/${this.endpoint}`)
+      .pipe(catchError(this.tratarErro));
   }
 
   adicionarHeroi(heroi: Heroi): Observable<Heroi> {
-    const novoId = Math.max(...this.herois.map(h => h.id), 0) + 1;
-    const novoHeroi = { ...heroi, id: novoId };
-    this.herois.push(novoHeroi);
-    return of(novoHeroi);
+    return this.http
+      .post<Heroi>(`${this.apiUrl}/${this.endpoint}`, heroi)
+      .pipe(catchError(this.tratarErro));
   }
 
   atualizarHeroi(heroi: Heroi): Observable<Heroi> {
-    const index = this.herois.findIndex(h => h.id === heroi.id);
-    if (index >= 0) {
-      this.herois[index] = heroi;
-      return of(heroi);
-    }
-    return throwError(() => new Error('Herói não encontrado'));
+    return this.http
+      .put<Heroi>(`${this.apiUrl}/${this.endpoint}/${heroi.id}`, heroi)
+      .pipe(catchError(this.tratarErro));
   }
 
-  excluirHeroi(id: number): Observable<boolean> {
-    const index = this.herois.findIndex(h => h.id === id);
-    if (index >= 0) {
-      this.herois.splice(index, 1);
-      return of(true);
-    }
-    return of(false);
+  excluirHeroi(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${this.endpoint}/${id}`)
+      .pipe(catchError(this.tratarErro));
   }
 }
