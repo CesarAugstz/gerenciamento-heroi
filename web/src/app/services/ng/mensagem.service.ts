@@ -5,23 +5,31 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   providedIn: 'root',
 })
 export class MensagemService {
+  private readonly MAX_MESSAGE_LENGTH = 150;
+  
   constructor(private snackBar: MatSnackBar) {}
 
   private tratarErro(error: unknown): string {
     if (!error) return '';
 
     if (error instanceof Error) {
-      return error.message;
+      return this.formatLongMessage(error.message);
     }
     return 'Ocorreu um erro desconhecido.';
   }
 
+  private formatLongMessage(message: string): string {
+    if (message.length <= this.MAX_MESSAGE_LENGTH) {
+      return message;
+    }
+    return message.substring(0, this.MAX_MESSAGE_LENGTH) + '...';
+  }
+
   mostrarSucesso(mensagem: string): void {
-    this.snackBar.open(mensagem, 'Fechar', {
+    this.snackBar.open(this.formatLongMessage(mensagem), 'Fechar', {
       duration: 3000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
-      
       panelClass: ['snackbar-sucesso'],
     });
   }
@@ -32,11 +40,11 @@ export class MensagemService {
     let mensagemFormatada = mensagem;
     if (erro) mensagemFormatada += `: ${this.tratarErro(erro)}`;
 
-    this.snackBar.open(mensagemFormatada, 'Fechar', {
+    this.snackBar.open(this.formatLongMessage(mensagemFormatada), 'Fechar', {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
-      panelClass: ['snackbar-erro'],
+      panelClass: ['snackbar-erro', 'multiline-snackbar'],
     });
   }
 }

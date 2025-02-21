@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -15,13 +15,11 @@ export class BaseService {
   }
 
   protected tratarErro(error: unknown) {
-    if (
-      error instanceof Object &&
-      'error' in error &&
-      typeof error.error === 'string'
-    ) {
+    if (error instanceof HttpErrorResponse) {
       console.error('Ocorreu um erro:', error.error);
-      return throwError(() => new Error(error.error as string));
+      return throwError(
+        () => new Error(error.error?.message || 'Erro desconhecido')
+      );
     }
 
     if (error instanceof Error) {

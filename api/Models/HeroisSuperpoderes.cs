@@ -2,7 +2,7 @@ using api.Models.Common;
 
 namespace api.Models
 {
-    public class HeroisSuperpoderes: EntityBase
+    public class HeroisSuperpoderes : EntityBase
     {
         public required int HeroiId { get; set; }
         public required int SuperpoderId { get; set; }

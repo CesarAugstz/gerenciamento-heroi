@@ -1,0 +1,9 @@
+.multiline-snackbar {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 80vw !important;
+}
+
+.mat-snack-bar-container {
+  max-width: 80vw !important;
+}

@@ -1,17 +1,19 @@
-using Microsoft.EntityFrameworkCore;
 using api.Data;
-using api.Repositories;
-using api.Models;
 using api.Mappings;
-using AutoMapper;
+using api.Middleware;
+using api.Models;
+using api.Repositories;
 using api.Services;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
@@ -19,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<IHeroiService, HeroiService>();
 
-var config = new MapperConfiguration(cfg => 
+var config = new MapperConfiguration(cfg =>
 {
     cfg.AddMaps(typeof(Program).Assembly);
 });
@@ -36,11 +38,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gerenciamento de Heróis API v1"));
+    app.UseSwaggerUI(c =>
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gerenciamento de Heróis API v1")
+    );
 }
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.Run();
+

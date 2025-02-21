@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using api.Dtos;
 using api.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers;
 
@@ -26,7 +26,8 @@ public class HeroisController : ControllerBase
     public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
     {
         var heroi = await _heroiService.GetHeroiByIdAsync(id, cancellationToken);
-        if (heroi == null) return NotFound("Heroi não encontrado");
+        if (heroi == null)
+            return NotFound("Heroi não encontrado");
         return Ok(heroi);
     }
 
@@ -52,12 +53,17 @@ public class HeroisController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, HeroiDto heroi, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(
+        int id,
+        HeroiDto heroi,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
             var result = await _heroiService.UpdateHeroiAsync(id, heroi, cancellationToken);
-            if (!result) return NotFound("Heroi não encontrado");
+            if (!result)
+                return NotFound("Heroi não encontrado");
             return NoContent();
         }
         catch (InvalidOperationException ex)
@@ -70,15 +76,18 @@ public class HeroisController : ControllerBase
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var result = await _heroiService.DeleteHeroiAsync(id, cancellationToken);
-        if (!result) return NotFound("Heroi não encontrado");
+        if (!result)
+            return NotFound("Heroi não encontrado");
         return NoContent();
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string term, CancellationToken cancellationToken)
+    public async Task<IActionResult> Search(
+        [FromQuery] string term,
+        CancellationToken cancellationToken
+    )
     {
         var herois = await _heroiService.SearchHeroisAsync(term, cancellationToken);
         return Ok(herois);
     }
-
 }
